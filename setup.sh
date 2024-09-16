@@ -6,6 +6,24 @@ if [ "$EUID" -ne 0 ]; then
   exit
 fi
 
+# Call each setup script from the scripts directory
+# "./.scripts/set_hostname_timezone.sh"
+# "./.scripts/setup_user.sh"
+# "./.scripts/setup_ufw.sh"
+
+# Inform user of completion
+echo "All setup tasks completed."
+
+# Refresh the environment with the new hostname
+echo "Refreshing environment..."
+exec bash -l
+
+
+
+
+
+
+
 # Prompt for new username
 read -p "Enter new username: " username
 
