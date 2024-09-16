@@ -1,28 +1,26 @@
 #!/usr/bin/env bash
 
-# Check if the script is run as root
-if [ "$EUID" -ne 0 ]; then 
-  echo "Please run as root."
+# Check if the script is run by setup.sh
+if [ "$RUN_BY_SETUP" != "true" ]; then
+  echo "This script must be run by setup.sh" 1>&2
   exit 1
 fi
 
-# Prompt for new hostname
-read -p "Enter the new hostname: " new_hostname
-
 # Validate hostname input
-if [[ -z "$new_hostname" ]]; then
+if [[ -z "$HOSTNAME" ]]; then
   echo "Hostname cannot be empty. Exiting."
   exit 1
 fi
 
 # Change the hostname
-if ! hostnamectl set-hostname "$new_hostname"; then
+if ! hostnamectl set-hostname "$HOSTNAME"; then
   echo "Failed to change hostname. Exiting."
   exit 1
 fi
 
 # Update /etc/hosts to reflect the new hostname
-if ! sed -i "s/$(hostname)/$new_hostname/" /etc/hosts; then
+current_hostname=$(hostname)
+if ! sed -i "s/$current_hostname/$HOSTNAME/" /etc/hosts; then
   echo "Failed to update /etc/hosts. Exiting."
   exit 1
 fi
@@ -34,4 +32,4 @@ if ! timedatectl set-timezone Europe/London; then
 fi
 
 # Inform user of changes
-echo "Hostname changed to $new_hostname and timezone set to Europe/London."
+echo "Hostname changed to $HOSTNAME and timezone set to Europe/London."
