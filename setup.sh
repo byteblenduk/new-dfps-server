@@ -1,15 +1,38 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Check if the script is run as root
 if [ "$EUID" -ne 0 ]; then 
   echo "Please run as root."
-  exit
+  exit 1
 fi
 
-# Call each setup script from the scripts directory
-# "./.scripts/set_hostname_timezone.sh"
-# "./.scripts/setup_user.sh"
-# "./.scripts/setup_ufw.sh"
+# Define the scripts directory
+scripts_dir="./.scripts"
+
+# Array of scripts to be executed
+scripts=(
+  "set_hostname_timezone.sh"
+  "setup_user.sh"
+  "setup_ufw.sh"
+)
+
+# Set environment variable to verify script origin
+export RUN_BY_SETUP=true
+
+# Execute each setup script
+for script in "${scripts[@]}"; do
+  script_path="$scripts_dir/$script"
+  
+  if [ -f "$script_path" ]; then
+    echo "Running $script_path..."
+    if ! bash "$script_path"; then
+      echo "Error occurred while running $script_path. Exiting."
+      exit 1
+    fi
+  else
+    echo "$script_path does not exist. Skipping."
+  fi
+done
 
 # Inform user of completion
 echo "All setup tasks completed."
