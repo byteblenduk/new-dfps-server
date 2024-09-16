@@ -10,14 +10,13 @@ fi
 apt update && apt upgrade -y
 
 # Define the scripts directory
-scripts_dir="./.scripts"
+SCRIPT_DIR="./.scripts"
 
-# Array of scripts to be executed
-scripts=(
-  "set_hostname_timezone.sh"
-  "setup_user.sh"
-  "setup_ufw.sh"
-)
+# Ensure the script directory exists
+if [ ! -d "$SCRIPT_DIR" ]; then
+  echo "Script directory $SCRIPT_DIR does not exist." 1>&2
+  exit 1
+fi
 
 # Set environment variable to verify script origin
 export RUN_BY_SETUP=true
@@ -46,17 +45,12 @@ export USERNAME=$username
 export PASSWORD=$password
 
 # Execute each setup script
-for script in "${scripts[@]}"; do
-  script_path="$scripts_dir/$script"
-  
-  if [ -f "$script_path" ]; then
-    echo "Running $script_path..."
-    if ! bash "$script_path"; then
-      echo "Error occurred while running $script_path. Exiting."
-      exit 1
-    fi
+for script in "$SCRIPT_DIR"/*.sh; do
+  if [ -x "$script" ]; then
+    echo "Running $script..."
+    "$script" || { echo "Error running $script" 1>&2; exit 1; }
   else
-    echo "$script_path does not exist. Skipping."
+    echo "Skipping $script (not executable)" 1>&2
   fi
 done
 
@@ -66,49 +60,3 @@ echo "All setup tasks completed."
 # Refresh the environment with the new hostname
 echo "Refreshing environment..."
 exec bash -l
-
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-##################################################################
-
-# Install required packages
-apt install -y apt-transport-https ca-certificates curl software-properties-common
-
-# Add Docker's official GPG key
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-
-# Set up the Docker stable repository
-echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-# Update package index
-apt update
-
-# Install Docker Engine, CLI, and Docker Compose plugin
-apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
-# Prompt for the username to add to the docker group
-read -p "Enter username to add to docker group: " username
-
-# Add the user to the docker group
-usermod -aG docker "$username"
-
-# Enable and start Docker service
-systemctl enable docker
-systemctl start docker
-
-echo "Docker and Docker Compose installed and configured. User $username added to the docker group."
-
-############################
-############################
-############################
-
-# Refresh the environment with the new hostname and timezone
-exec bash -l
-
-# Display Fail2Ban status
-fail2ban-client status
-
-echo "Fail2Ban installed and configured. Service is running."
