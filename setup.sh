@@ -18,6 +18,9 @@ if [ ! -d "$SCRIPT_DIR" ]; then
   exit 1
 fi
 
+# Make all scripts in the .scripts directory executable
+chmod +x "$SCRIPT_DIR"/*.sh
+
 # Set environment variable to verify script origin
 export RUN_BY_SETUP=true
 
