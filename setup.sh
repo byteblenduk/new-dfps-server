@@ -82,30 +82,12 @@ systemctl start docker
 
 echo "Docker and Docker Compose installed and configured. User $username added to the docker group."
 
-###############################################################
+############################
+############################
+############################
 
-# Set up Fail2Ban
-
-# Install Fail2Ban
-apt install -y fail2ban
-
-# Create a local configuration file to override default settings
-cat <<EOF > /etc/fail2ban/jail.local
-[DEFAULT]
-bantime  = 10m
-findtime = 10m
-maxretry = 5
-
-[sshd]
-enabled  = true
-port     = ssh
-logpath  = %(sshd_log)s
-backend  = systemd
-EOF
-
-# Enable and start Fail2Ban service
-systemctl enable fail2ban
-systemctl start fail2ban
+# Refresh the environment with the new hostname and timezone
+exec bash -l
 
 # Display Fail2Ban status
 fail2ban-client status
