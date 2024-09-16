@@ -19,6 +19,29 @@ scripts=(
 # Set environment variable to verify script origin
 export RUN_BY_SETUP=true
 
+# Prompt for new hostname
+read -p "New Hostname: " hostname
+
+# Prompt for new username
+read -p "Enter new username: " username
+
+# Prompt for password securely
+read -s -p "Enter password for new user: " password
+echo
+read -s -p "Confirm password: " password_confirm
+echo
+
+# Check if passwords match
+if [ "$password" != "$password_confirm" ]; then
+  echo "Passwords do not match. Exiting."
+  exit 1
+fi
+
+# Set environment variables for hostname, user & password
+export HOSTNAME=$hostname
+export USERNAME=$username
+export PASSWORD=$password
+
 # Execute each setup script
 for script in "${scripts[@]}"; do
   script_path="$scripts_dir/$script"
@@ -41,11 +64,11 @@ echo "All setup tasks completed."
 echo "Refreshing environment..."
 exec bash -l
 
-
-
-
-
-
+##################################################################
+##################################################################
+##################################################################
+##################################################################
+##################################################################
 
 # Prompt for new username
 read -p "Enter new username: " username
