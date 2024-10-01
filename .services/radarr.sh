@@ -9,8 +9,20 @@ fi
 # User home directory (use tilde expansion for flexibility)
 USER_HOME=$(eval echo "~$USERNAME")
 
-echo "Creating docker-compose.yml file..."
-cat <<EOF > "$USER_HOME/docker-compose.yml"
+# Check if the docker-compose.yml file exists
+if [ ! -f "$USER_HOME/docker-compose.yml" ]; then
+  echo "Error: docker-compose.yml file doesn't exist" 1>&2
+  exit 1
+fi
+
+# Check if the Radarr service already exists in docker-compose.yml
+if grep -q "radarr:" "$USER_HOME/docker-compose.yml"; then
+  echo "Radarr service already exists in docker-compose.yml. No changes made." 1>&2
+  exit 0
+fi
+
+echo "Adding Radarr to docker-compose.yml file..."
+cat <<EOF >> "$USER_HOME/docker-compose.yml"  # Use '>>' to append to the file
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
@@ -30,3 +42,5 @@ cat <<EOF > "$USER_HOME/docker-compose.yml"
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"  # Radarr's internal port
     restart: unless-stopped
 EOF
+
+echo "Radarr has been added to docker-compose.yml successfully."
