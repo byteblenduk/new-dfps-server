@@ -6,48 +6,73 @@ if [ "$RUN_BY_SETUP" != "true" ]; then
   exit 1
 fi
 
-# User variables
-USER_HOME="$USER_DIR"
-DOCKER_COMPOSE_FILE="$USER_HOME/docker-compose.yml"
-ENV_FILE="$USER_HOME/.env"
+# User home directory (use tilde expansion for flexibility)
+USER_HOME=$(eval echo "~$USERNAME")
+
+read -p "Lets Encrpt Email: "
 
 # Create the .env file with initial placeholders
 echo "Creating .env file..."
-cat <<EOF > "$ENV_FILE"
+cat <<EOF > "$USER_HOME/.env"
 PROJECT_NAME=$PROJECT_NAME
 DB_NAME=$DB_NAME
 DB_USER=$DB_USER
 DB_PASSWORD=$DB_PASSWORD
 DB_PORT=$DB_PORT
+LETSENCRYPTEMAIL=$LETSENCRYPTEMAIL  # Added Let's Encrypt email variable
 EOF
+
+# Check if the .env file was created successfully
+if [ ! -f "$USER_HOME/.env" ]; then
+  echo "Failed to create .env file" 1>&2
+  exit 1
+fi
+
+# Create the acme.json file for Let's Encrypt certificates if it doesn't exist
+if [ ! -f "$USER_HOME/acme.json" ]; then
+  echo "{}" > "$USER_HOME/acme.json"  # Initialize with empty JSON
+  chmod 600 "$USER_HOME/acme.json"  # Set permissions
+fi
 
 # Create the docker-compose.yml file with a basic structure
 echo "Creating docker-compose.yml file..."
-cat <<EOF > "$DOCKER_COMPOSE_FILE"
-version: '3'
+cat <<EOF > "$USER_HOME/docker-compose.yml"
+version: '3.8'
 
 services:
-  db:
-    image: mysql:latest
-    container_name: ${PROJECT_NAME}_db
-    environment:
-      - MYSQL_DATABASE=\${DB_NAME}
-      - MYSQL_USER=\${DB_USER}
-      - MYSQL_PASSWORD=\${DB_PASSWORD}
-      - MYSQL_ROOT_PASSWORD=\${DB_PASSWORD}
+  traefik:
+    image: traefik:v2.10  # Use the latest stable version
+    command:
+      - "--api.insecure=true"  # Enable the Traefik dashboard (insecure, for testing only)
+      - "--providers.docker=true"  # Enable Docker as a provider
+      - "--entrypoints.web.address=:80"  # Define entrypoint for HTTP traffic
+      - "--entrypoints.websecure.address=:443"  # Define entrypoint for HTTPS traffic
+      - "--entrypoints.web.http.redirections.entryPoint.secure.redirect.entryPoint=websecure"  # Redirect HTTP to HTTPS
+      - "--certificatesresolvers.myresolver.acme.httpchallenge=true"  # Enable HTTP challenge for Let's Encrypt
+      - "--certificatesresolvers.myresolver.acme.httpchallenge.entrypoint=web"  # Entry point for the challenge
+      - "--certificatesresolvers.myresolver.acme.email=\${LETSENCRYPTEMAIL}"  # Email from variable
+      - "--certificatesresolvers.myresolver.acme.storage=/acme.json"  # Store certificates
     ports:
-      - "\${DB_PORT}:3306"
+      - "80:80"  # Expose HTTP
+      - "443:443"  # Expose HTTPS
+      - "8080:8080"  # Expose Traefik dashboard
     volumes:
-      - db_data:/var/lib/mysql
-
-volumes:
-  db_data:
+      - "/var/run/docker.sock:/var/run/docker.sock"  # Enable Traefik to communicate with the Docker API
+      - "./acme.json:/acme.json"  # Persistent storage for Let's Encrypt certificates
+    restart: unless-stopped
 EOF
+
+# Check if the docker-compose.yml file was created successfully
+if [ ! -f "$USER_HOME/docker-compose.yml" ]; then
+  echo "Failed to create docker-compose.yml file" 1>&2
+  exit 1
+fi
 
 # Set ownership of the created files to the user
 echo "Setting ownership of the files to the user..."
-chown $USER:$USER "$ENV_FILE"
-chown $USER:$USER "$DOCKER_COMPOSE_FILE"
+chown $USERNAME:$USERNAME "$USER_HOME/.env"
+chown $USERNAME:$USERNAME "$USER_HOME/docker-compose.yml"
+chown $USERNAME:$USERNAME "$USER_HOME/acme.json"  # Ensure acme.json ownership
 
 # Inform that files were created successfully
-echo "Files created successfully in $USER_HOME"
+echo "Files created successfully for user $USERNAME"
