@@ -25,7 +25,7 @@ port = ssh
 logpath = %(sshd_log)s
 maxretry = 3
 findtime = 30m
-bantime = 6h
+bantime = 5m
 EOF
 
 # Restart Fail2Ban to apply the new configuration
