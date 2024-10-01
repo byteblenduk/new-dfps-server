@@ -9,9 +9,8 @@ fi
 # User home directory (use tilde expansion for flexibility)
 USER_HOME=$(eval echo "~$USERNAME")
 
-# Radarr service configuration
-cat >> "$DOCKER_COMPOSE_FILE" <<EOL
-
+echo "Creating docker-compose.yml file..."
+cat <<EOF > "$USER_HOME/docker-compose.yml"
   radarr:
     container_name: radarr
     image: lscr.io/linuxserver/radarr:latest
@@ -30,3 +29,4 @@ cat >> "$DOCKER_COMPOSE_FILE" <<EOL
       - "traefik.http.routers.radarr.tls.certresolver=myresolver"  # Use the Let's Encrypt resolver
       - "traefik.http.services.radarr.loadbalancer.server.port=7878"  # Radarr's internal port
     restart: unless-stopped
+EOF
