@@ -9,7 +9,7 @@ fi
 # User home directory (use tilde expansion for flexibility)
 USER_HOME=$(eval echo "~$USERNAME")
 
-read -p "Lets Encrpt Email: "
+read -p "Lets Encrpt Email: " LETSENCRYPTEMAIL
 
 # Create the .env file with initial placeholders
 echo "Creating .env file..."
