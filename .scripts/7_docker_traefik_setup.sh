@@ -9,7 +9,8 @@ fi
 # User home directory (use tilde expansion for flexibility)
 USER_HOME=$(eval echo "~$USERNAME")
 
-read -p "Lets Encrpt Email: " LETSENCRYPTEMAIL
+# Prompt for Let's Encrypt email and validate input
+read -p "Please enter your Let's Encrypt email address: " LETSENCRYPTEMAIL
 if [[ -z "$LETSENCRYPTEMAIL" ]]; then
   echo "Email cannot be empty." 1>&2
   exit 1
@@ -33,6 +34,10 @@ fi
 if [ ! -f "$USER_HOME/acme.json" ]; then
   echo "{}" > "$USER_HOME/acme.json"  # Initialize with empty JSON
   chmod 600 "$USER_HOME/acme.json"  # Set permissions
+  if [ $? -ne 0 ]; then
+    echo "Failed to set permissions on acme.json" 1>&2
+    exit 1
+  fi
 fi
 
 # Create the docker-compose.yml file with a basic structure
@@ -69,9 +74,9 @@ fi
 
 # Set ownership of the created files to the user
 echo "Setting ownership of the files to the user..."
-chown $USERNAME:$USERNAME "$USER_HOME/.env"
-chown $USERNAME:$USERNAME "$USER_HOME/docker-compose.yml"
-chown $USERNAME:$USERNAME "$USER_HOME/acme.json"  # Ensure acme.json ownership
+chown "$USERNAME:$USERNAME" "$USER_HOME/.env"
+chown "$USERNAME:$USERNAME" "$USER_HOME/docker-compose.yml"
+chown "$USERNAME:$USERNAME" "$USER_HOME/acme.json"  # Ensure acme.json ownership
 
 # Inform that files were created successfully
 echo "Files created successfully for user $USERNAME"
