@@ -16,46 +16,44 @@ fi
 BASE_DIR="/data"
 
 # Create the directory structure
-mkdir -p "$BASE_DIR/torrents/3x/movies"
-mkdir -p "$BASE_DIR/torrents/3x/scenes"
-mkdir -p "$BASE_DIR/torrents/3x/tv"
-mkdir -p "$BASE_DIR/torrents/3x/jav"
-mkdir -p "$BASE_DIR/torrents/anime"
-mkdir -p "$BASE_DIR/torrents/books"
-mkdir -p "$BASE_DIR/torrents/comics"
-mkdir -p "$BASE_DIR/torrents/movies"
-mkdir -p "$BASE_DIR/torrents/music"
-mkdir -p "$BASE_DIR/torrents/tv"
-
-mkdir -p "$BASE_DIR/usenet/incomplete"
-mkdir -p "$BASE_DIR/usenet/complete/3x/movies"
-mkdir -p "$BASE_DIR/usenet/complete/3x/scenes"
-mkdir -p "$BASE_DIR/usenet/complete/3x/tv"
-mkdir -p "$BASE_DIR/usenet/complete/3x/jav"
-mkdir -p "$BASE_DIR/usenet/complete/anime"
-mkdir -p "$BASE_DIR/usenet/complete/books"
-mkdir -p "$BASE_DIR/usenet/complete/comics"
-mkdir -p "$BASE_DIR/usenet/complete/movies"
-mkdir -p "$BASE_DIR/usenet/complete/music"
-mkdir -p "$BASE_DIR/usenet/complete/tv"
-
-mkdir -p "$BASE_DIR/media/3x/movies"
-mkdir -p "$BASE_DIR/media/3x/scenes"
-mkdir -p "$BASE_DIR/media/3x/tv"
-mkdir -p "$BASE_DIR/media/3x/jav"
-mkdir -p "$BASE_DIR/media/anime"
-mkdir -p "$BASE_DIR/media/books"
-mkdir -p "$BASE_DIR/media/comics"
-mkdir -p "$BASE_DIR/media/photos"
-mkdir -p "$BASE_DIR/media/movies"
-mkdir -p "$BASE_DIR/media/music"
-mkdir -p "$BASE_DIR/media/tv"
+mkdir -p /data/torrents/3x/movies
+mkdir -p /data/torrents/3x/scenes
+mkdir -p /data/torrents/3x/tv
+mkdir -p /data/torrents/3x/jav
+mkdir -p /data/torrents/anime
+mkdir -p /data/torrents/books
+mkdir -p /data/torrents/comics
+mkdir -p /data/torrents/movies
+mkdir -p /data/torrents/music
+mkdir -p /data/torrents/tv
+mkdir -p /data/usenet/incomplete
+mkdir -p /data/usenet/complete/3x/movies
+mkdir -p /data/usenet/complete/3x/scenes
+mkdir -p /data/usenet/complete/3x/tv
+mkdir -p /data/usenet/complete/3x/jav
+mkdir -p /data/usenet/complete/anime
+mkdir -p /data/usenet/complete/books
+mkdir -p /data/usenet/complete/comics
+mkdir -p /data/usenet/complete/movies
+mkdir -p /data/usenet/complete/music
+mkdir -p /data/usenet/complete/tv
+mkdir -p /data/media/3x/movies
+mkdir -p /data/media/3x/scenes
+mkdir -p /data/media/3x/tv
+mkdir -p /data/media/3x/jav
+mkdir -p /data/media/anime
+mkdir -p /data/media/books
+mkdir -p /data/media/comics
+mkdir -p /data/media/photos
+mkdir -p /data/media/movies
+mkdir -p /data/media/music
+mkdir -p /data/media/tv
 
 # Set ownership to the specified user
-chown -R "$USERNAME:$USERNAME" "$BASE_DIR"
+chown -R "$USERNAME:$USERNAME" /data
 
 # Set permissions
-chmod -R 775 "$BASE_DIR"
-find "$BASE_DIR" -type f -exec chmod 664 {} \;
+chmod -R 775 /data
+find /data -type f -exec chmod 664 {} \;
 
 echo "Directory structure created and ownership set to $USERNAME."
