@@ -9,19 +9,27 @@ fi
 # User home directory (use tilde expansion for flexibility)
 USER_HOME=$(eval echo "~$USERNAME")
 
-# Prompt for Let's Encrypt email and validate input
-read -p "Please enter your Let's Encrypt email address: " LETSENCRYPTEMAIL
+# Ask for Let's Encrypt email
+read -p "Let's Encrypt Email: " LETSENCRYPTEMAIL
 if [[ -z "$LETSENCRYPTEMAIL" ]]; then
   echo "Email cannot be empty." 1>&2
+  exit 1
+fi
+
+# Ask for the base domain
+read -p "Base Domain (e.g., example.com): " BASE_DOMAIN
+if [[ -z "$BASE_DOMAIN" ]]; then
+  echo "Base domain cannot be empty." 1>&2
   exit 1
 fi
 
 # Create the .env file with initial placeholders
 echo "Creating .env file..."
 cat <<EOF > "$USER_HOME/.env"
+LETSENCRYPTEMAIL=$LETSENCRYPTEMAIL  # Added Let's Encrypt email variable
+BASE_DOMAIN=$BASE_DOMAIN  # Base domain variable for containers
 DATA_DIR=/data
 APPDATA_DIR=$USER_HOME/.appdata
-LETSENCRYPTEMAIL=$LETSENCRYPTEMAIL  # Added Let's Encrypt email variable
 EOF
 
 # Check if the .env file was created successfully
