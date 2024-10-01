@@ -10,15 +10,16 @@ fi
 USER_HOME=$(eval echo "~$USERNAME")
 
 read -p "Lets Encrpt Email: " LETSENCRYPTEMAIL
+if [[ -z "$LETSENCRYPTEMAIL" ]]; then
+  echo "Email cannot be empty." 1>&2
+  exit 1
+fi
 
 # Create the .env file with initial placeholders
 echo "Creating .env file..."
 cat <<EOF > "$USER_HOME/.env"
-PROJECT_NAME=$PROJECT_NAME
-DB_NAME=$DB_NAME
-DB_USER=$DB_USER
-DB_PASSWORD=$DB_PASSWORD
-DB_PORT=$DB_PORT
+DATA_DIR=/data
+APPDATA_DIR=$USER_HOME/.appdata
 LETSENCRYPTEMAIL=$LETSENCRYPTEMAIL  # Added Let's Encrypt email variable
 EOF
 
@@ -37,8 +38,6 @@ fi
 # Create the docker-compose.yml file with a basic structure
 echo "Creating docker-compose.yml file..."
 cat <<EOF > "$USER_HOME/docker-compose.yml"
-version: '3.8'
-
 services:
   traefik:
     image: traefik:v2.10  # Use the latest stable version
